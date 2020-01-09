@@ -1,3 +1,6 @@
+This is forked from https://github.com/ZheyuanXie/KLT-Feature-Tracking. The repo name has been changed to make a python package.
+
+---
 # KLT-Feature-Tracking
 
 ## Getting Started
