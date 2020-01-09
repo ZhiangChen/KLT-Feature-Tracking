@@ -20,7 +20,12 @@ def applyGeometricTransformation(startXs, startYs, newXs, newYs, bbox):
         newYs_obj = newYs[:,[obj_idx]]
         desired_points = np.hstack((startXs_obj,startYs_obj))
         actual_points = np.hstack((newXs_obj,newYs_obj))
-        t = tf.SimilarityTransform()
+        #t = tf.SimilarityTransform()
+        if actual_points.shape[0] > 6:
+            t = tf.AffineTransform()
+        else:
+            t = tf.SimilarityTransform()
+        
         t.estimate(dst=actual_points, src=desired_points)
         mat = t.params
 

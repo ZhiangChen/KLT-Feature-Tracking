@@ -40,6 +40,8 @@ def objectTracking(rawVideo, draw_bb=False, play_realtime=False, save_to_file=Fa
     startXs,startYs = getFeatures(cv2.cvtColor(frames[0],cv2.COLOR_RGB2GRAY),bboxs[0],use_shi=False)
     for i in range(1,n_frame):
         print('Processing Frame',i)
+        if frames[i] is None:
+            break
         newXs, newYs = estimateAllTranslation(startXs, startYs, frames[i-1], frames[i])
         Xs, Ys ,bboxs[i] = applyGeometricTransformation(startXs, startYs, newXs, newYs, bboxs[i-1])
         
@@ -80,6 +82,6 @@ def objectTracking(rawVideo, draw_bb=False, play_realtime=False, save_to_file=Fa
 
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("Medium.mp4")
+    cap = cv2.VideoCapture("boulder.avi")
     objectTracking(cap,draw_bb=True,play_realtime=True,save_to_file=True)
     cap.release()
