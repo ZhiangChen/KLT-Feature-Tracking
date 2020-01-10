@@ -21,20 +21,20 @@ def applyGeometricTransformation(startXs, startYs, newXs, newYs, bbox):
         desired_points = np.hstack((startXs_obj,startYs_obj))
         actual_points = np.hstack((newXs_obj,newYs_obj))
         #t = tf.SimilarityTransform()
-        if actual_points.shape[0] > 6:
+        if np.sum(newXs_obj != -1) > 6:
             t = tf.AffineTransform()
         else:
             t = tf.SimilarityTransform()
-        
         t.estimate(dst=actual_points, src=desired_points)
         mat = t.params
 
         # estimate the new bounding box with all the feature points
-        # coords = np.vstack((bbox[obj_idx,:,:].T,np.array([1,1,1,1])))
-        # new_coords = mat.dot(coords)
-        # newbbox[obj_idx,:,:] = new_coords[0:2,:].T
+        coords = np.vstack((bbox[obj_idx,:,:].T,np.array([1,1,1,1])))
+        new_coords = mat.dot(coords)
+        newbbox[obj_idx,:,:] = new_coords[0:2,:].T
 
         # estimate the new bounding box with only the inliners (Added by Yongyi Wang)
+        """
         THRES = 1
         projected = mat.dot(np.vstack((desired_points.T.astype(float),np.ones([1,np.shape(desired_points)[0]]))))
         distance = np.square(projected[0:2,:].T - actual_points).sum(axis = 1)
@@ -51,6 +51,7 @@ def applyGeometricTransformation(startXs, startYs, newXs, newYs, bbox):
         newbbox[obj_idx,:,:] = new_coords[0:2,:].T
         Xs[distance >= THRES, obj_idx] = -1
         Ys[distance >= THRES, obj_idx] = -1
+        """
 
     return Xs, Ys, newbbox
 
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     from getFeatures import getFeatures
     from estimateAllTranslation import estimateAllTranslation
 
-    cap = cv2.VideoCapture("Easy.mp4")
+    cap = cv2.VideoCapture("hard.mp4")
     ret, frame1 = cap.read()  # get first frame
     ret, frame2 = cap.read()  # get second frame
     ret, frame2 = cap.read()  # get second frame
@@ -82,6 +83,7 @@ if __name__ == "__main__":
     # We can use fixed
     n_object = 1
     bbox = np.array([[[291,187],[405,187],[291,267],[405,267]]]).astype(float)
+    bbox = np.array([[[12, 37], [200, 37], [12, 428], [200, 428]]])  # hard
 
     startXs,startYs = getFeatures(frame1_gray,bbox)
     newXs, newYs =  estimateAllTranslation(startXs, startYs, frame1, frame2)

@@ -28,7 +28,7 @@ def estimateAllTranslation(startXs,startYs,img1,img2):
     return newXs, newYs
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("Easy.mp4")
+    cap = cv2.VideoCapture("hard.mp4")
     ret, frame1 = cap.read()  # get first frame
     ret, frame2 = cap.read()  # get second frame
     ret, frame2 = cap.read()  # get second frame
@@ -42,6 +42,8 @@ if __name__ == "__main__":
 
     n_object = 1
     bbox = np.array([[[291,187],[405,187],[291,267],[405,267]]])
+    bbox = np.array([[[12, 37], [132, 37], [12, 428], [132, 428]]])  # hard
+    bbox = np.array([[[12, 37], [200, 37], [12, 428], [200, 428]]])  # hard
 
     startXs,startYs = getFeatures(frame1_gray,bbox)
     newXs, newYs =  estimateAllTranslation(startXs, startYs, frame1, frame2)

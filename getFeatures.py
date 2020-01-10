@@ -15,7 +15,8 @@ def getFeatures(img,bbox,use_shi=False):
     for i in range(n_object):
         (xmin, ymin, boxw, boxh) = cv2.boundingRect(bbox[i,:,:].astype(int))
         roi = img[ymin:ymin+boxh,xmin:xmin+boxw]
-        # cv2.imshow('roi',roi)
+        #print(roi)
+        #cv2.imshow('roi',roi)
         if use_shi:
             corner_response = corner_shi_tomasi(roi)
         else:
@@ -35,7 +36,7 @@ def getFeatures(img,bbox,use_shi=False):
     return x,y
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("Easy.mp4")
+    cap = cv2.VideoCapture("hard.mp4")
     ret, frame = cap.read()  # get first frame
 
     # This section is for generating bounding boxes
@@ -48,7 +49,8 @@ if __name__ == "__main__":
 
     # We can use fixed
     n_object = 1
-    bbox = np.array([[[291,187],[405,187],[291,267],[405,267]]])
+    bbox = np.array([[[291,187],[405,187],[291,267],[405,267]]]) # easy
+    bbox = np.array([[[12, 37], [132, 37], [ 12, 428], [132, 428]]]) # hard
 
     frame_gray = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)
     x,y = getFeatures(frame_gray,bbox)

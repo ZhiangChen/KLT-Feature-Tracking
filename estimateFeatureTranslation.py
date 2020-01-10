@@ -6,6 +6,7 @@
 
 import numpy as np
 from numpy.linalg import inv
+from numpy.linalg import det
 import cv2
 from utils import interp2
 
@@ -25,7 +26,6 @@ def estimateFeatureTranslation(startX,startY,Ix,Iy,img1,img2):
     Iy_value = interp2(Iy, coor_fix[[0],:], coor_fix[[1],:])
     I=np.vstack((Ix_value,Iy_value))
     A=I.dot(I.T)
-   
 
     for _ in range(15):
         mesh_x_flat=mesh_x.flatten() + X - np.floor(WINDOW_SIZE / 2)
