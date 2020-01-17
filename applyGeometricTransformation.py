@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 from skimage import transform as tf
 
-def applyGeometricTransformation(startXs, startYs, newXs, newYs, bbox):
+def applyGeometricTransformation(startXs, startYs, newXs, newYs, bbox, Cov=None, R=None):
     n_object = bbox.shape[0]
     newbbox = np.zeros_like(bbox)
     Xs = newXs.copy()
@@ -29,12 +29,29 @@ def applyGeometricTransformation(startXs, startYs, newXs, newYs, bbox):
         mat = t.params
 
         # estimate the new bounding box with all the feature points
-        coords = np.vstack((bbox[obj_idx,:,:].T,np.array([1,1,1,1])))
+        # (bbox[obj_idx,:,:].T has shape 2x4
+        # coords has shape 3x4
+        coords = np.vstack((bbox[obj_idx,:,:].T, np.array([1,1,1,1])))
         new_coords = mat.dot(coords)
         newbbox[obj_idx,:,:] = new_coords[0:2,:].T
 
-        # estimate the new bounding box with only the inliners (Added by Yongyi Wang)
+        # update covariance matrix
+        if Cov is not None:
+            # mat is a 3x3 matrix
+            # Cov[obj_idx] is a 4x4 matrix
+            # convert the variables to Homogeneous coordinate system
+            cov = np.zeros((6, 6))
+            cov[:2, :2] = Cov[obj_idx][:2, :2]
+            cov[-2:, -2:] = Cov[obj_idx][2:, 2:]
+            A = np.zeros((6, 6))
+            A[:3, :3] = mat
+            A[3:, 3:] = mat
+            cov = A.dot(cov).dot(A.T) + R
+            Cov[obj_idx][:2, :2] = cov[:2, :2]
+            Cov[obj_idx][2:, 2:] = cov[-2:, -2:]
+
         """
+        # estimate the new bounding box with only the inliners (Added by Yongyi Wang)
         THRES = 1
         projected = mat.dot(np.vstack((desired_points.T.astype(float),np.ones([1,np.shape(desired_points)[0]]))))
         distance = np.square(projected[0:2,:].T - actual_points).sum(axis = 1)
@@ -52,14 +69,16 @@ def applyGeometricTransformation(startXs, startYs, newXs, newYs, bbox):
         Xs[distance >= THRES, obj_idx] = -1
         Ys[distance >= THRES, obj_idx] = -1
         """
-
-    return Xs, Ys, newbbox
+    if Cov is not None:
+        return Xs, Ys, newbbox, Cov
+    else:
+        return Xs, Ys, newbbox
 
 if __name__ == "__main__":
     from getFeatures import getFeatures
     from estimateAllTranslation import estimateAllTranslation
 
-    cap = cv2.VideoCapture("hard.mp4")
+    cap = cv2.VideoCapture("Easy.mp4")
     ret, frame1 = cap.read()  # get first frame
     ret, frame2 = cap.read()  # get second frame
     ret, frame2 = cap.read()  # get second frame
@@ -83,7 +102,7 @@ if __name__ == "__main__":
     # We can use fixed
     n_object = 1
     bbox = np.array([[[291,187],[405,187],[291,267],[405,267]]]).astype(float)
-    bbox = np.array([[[12, 37], [200, 37], [12, 428], [200, 428]]])  # hard
+    # bbox = np.array([[[12, 37], [200, 37], [12, 428], [200, 428]]])  # hard
 
     startXs,startYs = getFeatures(frame1_gray,bbox)
     newXs, newYs =  estimateAllTranslation(startXs, startYs, frame1, frame2)
