@@ -82,6 +82,6 @@ def objectTracking(rawVideo, draw_bb=False, play_realtime=False, save_to_file=Fa
 
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("boulder.avi")
+    cap = cv2.VideoCapture("Easy.mp4")
     objectTracking(cap,draw_bb=True,play_realtime=True,save_to_file=True)
     cap.release()
