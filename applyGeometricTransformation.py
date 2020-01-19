@@ -42,13 +42,14 @@ def applyGeometricTransformation(startXs, startYs, newXs, newYs, bbox, Cov=None,
             # convert the variables to Homogeneous coordinate system
             cov = np.zeros((6, 6))
             cov[:2, :2] = Cov[obj_idx][:2, :2]
-            cov[-2:, -2:] = Cov[obj_idx][2:, 2:]
+            cov[-3:-1, -3:-1] = Cov[obj_idx][2:, 2:]
             A = np.zeros((6, 6))
             A[:3, :3] = mat
             A[3:, 3:] = mat
             cov = A.dot(cov).dot(A.T) + R
             Cov[obj_idx][:2, :2] = cov[:2, :2]
-            Cov[obj_idx][2:, 2:] = cov[-2:, -2:]
+            Cov[obj_idx][2:, 2:] = cov[-3:-1, -3:-1]
+
 
         """
         # estimate the new bounding box with only the inliners (Added by Yongyi Wang)

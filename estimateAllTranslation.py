@@ -22,7 +22,10 @@ def estimateAllTranslation(startXs,startYs,img1,img2):
     newYs = np.full(startYs_flat.shape,-1,dtype=float)
     for i in range(np.size(startXs)):
         if startXs_flat[i] != -1:
-            newXs[i], newYs[i] = estimateFeatureTranslation(startXs_flat[i], startYs_flat[i], Ix, Iy, img1, img2)
+            try:
+                newXs[i], newYs[i] = estimateFeatureTranslation(startXs_flat[i], startYs_flat[i], Ix, Iy, img1, img2)
+            except np.linalg.LinAlgError:
+                None
     newXs = np.reshape(newXs, startXs.shape)
     newYs = np.reshape(newYs, startYs.shape)
     return newXs, newYs
