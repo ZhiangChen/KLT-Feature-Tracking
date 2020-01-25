@@ -11,6 +11,8 @@ from getFeatures import getFeatures
 from estimateAllTranslation import estimateAllTranslation
 from applyGeometricTransformation import applyGeometricTransformation
 
+import time
+
 
 def objectTracking(rawVideo, draw_bb=False, play_realtime=False, save_to_file=False):
     # initilize
@@ -42,10 +44,12 @@ def objectTracking(rawVideo, draw_bb=False, play_realtime=False, save_to_file=Fa
         print('Processing Frame',i)
         if frames[i] is None:
             break
+        seconds = time.time()
         newXs, newYs = estimateAllTranslation(startXs, startYs, frames[i-1], frames[i])
+        seconds = time.time() - seconds
+        print(seconds)
+
         Xs, Ys ,bboxs[i] = applyGeometricTransformation(startXs, startYs, newXs, newYs, bboxs[i-1])
-        if bboxs[i].min() < 0:
-            print(bboxs[i])
         
         # update coordinates
         startXs = Xs
@@ -85,6 +89,6 @@ def objectTracking(rawVideo, draw_bb=False, play_realtime=False, save_to_file=Fa
 
 if __name__ == "__main__":
     #cap = cv2.VideoCapture("Easy.mp4")
-    cap = cv2.VideoCapture("boulder2.avi")
+    cap = cv2.VideoCapture("boulder3.avi")
     objectTracking(cap,draw_bb=True,play_realtime=True,save_to_file=True)
     cap.release()
