@@ -21,14 +21,14 @@ def getFeatures(img,bbox,use_shi=False):
             corner_response = corner_shi_tomasi(roi)
         else:
             corner_response = corner_harris(roi)
-        coordinates = peak_local_max(corner_response,num_peaks=20,exclude_border=2)
+        coordinates = peak_local_max(corner_response, num_peaks=20, exclude_border=2)
         coordinates[:,1] += xmin
         coordinates[:,0] += ymin
         temp[i] = coordinates
         if coordinates.shape[0] > N:
             N = coordinates.shape[0]
-    x = np.full((N,n_object),-1)
-    y = np.full((N,n_object),-1)
+    x = np.full((20, n_object),-1)
+    y = np.full((20, n_object),-1)
     for i in range(n_object):
         n_feature = temp[i].shape[0]
         x[0:n_feature,i] = temp[i][:,1]
